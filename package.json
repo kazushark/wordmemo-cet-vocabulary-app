@@ -1,8 +1,8 @@
 {
   "name": "wordmemo-cet",
   "version": "1.0.0",
-  "private": true,
   "type": "module",
+  "license": "MIT",
   "description": "Offline-first CET vocabulary memo and study app.",
   "scripts": {
     "build:data": "node scripts/build-data.mjs",
