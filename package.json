@@ -1,0 +1,12 @@
+{
+  "name": "wordmemo-cet",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline-first CET vocabulary memo and study app.",
+  "scripts": {
+    "build:data": "node scripts/build-data.mjs",
+    "start": "node server.js",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

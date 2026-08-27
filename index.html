@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#173f3a" />
+    <title>词笺 WordMemo | 四六级生词备忘录</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <a class="brand" href="#" aria-label="词笺首页">
+          <span class="brand-mark">W</span>
+          <span><strong>词笺</strong><small>WordMemo</small></span>
+        </a>
+        <p class="sidebar-caption">将遇见的生词，变成掌握的表达。</p>
+        <div class="library-stat">
+          <strong id="word-count">0</strong>
+          <span>个待学单词</span>
+          <small><b id="reviewed-count">0</b> 个已完成过学习</small>
+        </div>
+        <nav class="nav" aria-label="主要功能">
+          <button class="nav-button active" data-view="add">输入单词</button>
+          <button class="nav-button" data-view="study">单词学习</button>
+          <button class="nav-button" data-view="library">我的词库</button>
+          <button class="nav-button" data-view="about">数据来源</button>
+        </nav>
+        <p class="source-note">本地保存，不上传学习记录<br />四六级释义与例句离线可查</p>
+      </aside>
+
+      <main class="workspace">
+        <section class="view active" id="view-add" aria-labelledby="add-title">
+          <div class="hero">
+            <div class="hero-copy">
+              <p class="eyebrow">VOCABULARY MEMO</p>
+              <h1 id="add-title">今天遇见了哪个<br />值得记住的词？</h1>
+              <p>输入单词，匹配释义与例句，在入库前亲自确认或修订。</p>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+              <img id="hero-image" src="/assets/hero-study.jpg" alt="" />
+            </div>
+          </div>
+
+          <div class="columns">
+            <article class="panel entry-panel">
+              <h2>添加生词</h2>
+              <form id="lookup-form" class="lookup">
+                <label class="sr-only" for="lookup-word">英文单词</label>
+                <input id="lookup-word" name="word" type="text" autocomplete="off" placeholder="例如：contemplate" required />
+                <button class="primary" type="submit">查找并添加</button>
+              </form>
+              <p class="shortcut-note">按 Enter 或点击按钮都会先打开释义确认栏。</p>
+              <div class="suggestions" aria-label="试试这些单词">
+                <span>试试：</span>
+                <button type="button" data-suggestion="abandon">abandon</button>
+                <button type="button" data-suggestion="comprehensive">comprehensive</button>
+                <button type="button" data-suggestion="contemplate">contemplate</button>
+              </div>
+              <p class="loading-note" id="data-status">正在载入离线四六级词库...</p>
+            </article>
+
+            <article class="panel recent-panel">
+              <div class="section-row">
+                <h2>最近加入</h2>
+                <button class="text-button" data-view="library">查看全部</button>
+              </div>
+              <div id="recent-words" class="empty-message">还没有生词，先记下第一个吧。</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="view-study" aria-labelledby="study-title">
+          <div class="page-header">
+            <p class="eyebrow">RECALL SESSION</p>
+            <h1 id="study-title">单词学习</h1>
+            <p>优先安排未学习和高错误率单词，先回想后揭晓。选择“不记得”的词，需要连续三次确认记得。</p>
+          </div>
+          <article class="panel setup-panel" id="study-setup">
+            <label for="study-library">选择学习范围</label>
+            <select id="study-library">
+              <option value="all">全部词库（0 词）</option>
+              <option value="favorites">星标单词（0 词）</option>
+            </select>
+            <label for="study-amount">本轮学习数量</label>
+            <div class="amount-row">
+              <input id="study-amount" type="number" min="1" value="10" />
+              <span id="amount-limit">所选范围共 0 词</span>
+              <button id="start-study" class="primary" type="button">开始学习</button>
+            </div>
+          </article>
+          <article class="practice-card hidden" id="practice-card">
+            <div class="progress-row">
+              <span id="session-progress">本轮完成 0 / 0</span>
+              <span id="queue-status">待出现 0 次</span>
+            </div>
+            <div id="prompt-stage">
+              <div class="prompt-layout">
+                <div class="prompt-copy">
+                  <p class="card-label">回想释义</p>
+                  <h2 id="study-word"></h2>
+                  <div class="hint hidden" id="hint-box">
+                    <span>英文例句提示</span>
+                    <p id="hint-sentence"></p>
+                  </div>
+                </div>
+                <aside class="prompt-review">
+                  <div class="action-row">
+                    <button id="remember-button" class="success" type="button">记得</button>
+                    <button id="forget-button" class="danger" type="button">不记得</button>
+                    <button id="hint-button" class="secondary" type="button">提示</button>
+                  </div>
+                </aside>
+              </div>
+            </div>
+            <div id="answer-stage" class="answer hidden">
+              <p class="answer-status" id="answer-status"></p>
+              <div class="answer-layout">
+                <div class="answer-copy">
+                  <div class="answer-word-row">
+                    <h2 id="answer-word"></h2>
+                    <button id="study-favorite" class="favorite-button" type="button" aria-label="收藏当前单词" aria-pressed="false">☆</button>
+                  </div>
+                  <p class="translation" id="answer-translation"></p>
+                  <div class="example-block">
+                    <span>例句</span>
+                    <p id="answer-example"></p>
+                    <p class="example-zh" id="answer-example-zh"></p>
+                  </div>
+                  <p class="roots" id="answer-roots"></p>
+                </div>
+                <aside class="answer-review">
+                  <section class="memory-stats" aria-label="本词记忆统计">
+                    <div>
+                      <span>正确</span>
+                      <strong id="answer-correct-count">0</strong>
+                    </div>
+                    <div>
+                      <span>未记得</span>
+                      <strong id="answer-incorrect-count">0</strong>
+                    </div>
+                    <div>
+                      <span>其中提示</span>
+                      <strong id="answer-hint-count">0</strong>
+                    </div>
+                    <div class="accuracy">
+                      <span>记忆正确率</span>
+                      <strong id="answer-accuracy">暂无</strong>
+                    </div>
+                  </section>
+                  <div class="answer-actions">
+                    <button id="mark-misremembered" class="danger hidden" type="button">记错了</button>
+                    <button id="next-card" class="primary" type="button">下一词</button>
+                  </div>
+                </aside>
+              </div>
+            </div>
+          </article>
+          <article class="panel completion hidden" id="completion">
+            <p class="eyebrow">SESSION COMPLETE</p>
+            <h2>本轮完成</h2>
+            <p id="completion-text"></p>
+            <button class="primary" id="study-again" type="button">开始新一轮</button>
+          </article>
+        </section>
+
+        <section class="view" id="view-library" aria-labelledby="library-title">
+          <div class="page-header">
+            <p class="eyebrow">MY LIBRARY</p>
+            <h1 id="library-title">我的词库</h1>
+            <p>释义与例句随时可以重新编辑，学习记录保存在当前浏览器。</p>
+          </div>
+          <article class="panel">
+            <div class="library-tools">
+              <input id="filter-word" type="search" placeholder="筛选词库" />
+              <button class="secondary" data-view="add" type="button">添加新词</button>
+            </div>
+            <div id="library-list" class="word-list"></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-about" aria-labelledby="about-title">
+          <div class="page-header">
+            <p class="eyebrow">OPEN DATA</p>
+            <h1 id="about-title">数据来源</h1>
+          </div>
+          <article class="panel about">
+            <h2>参考的开源项目</h2>
+            <p>应用的查词流程围绕备考场景整理，学习记录仅保存在浏览器的本地存储中。</p>
+            <a href="https://github.com/KyleBing/english-vocabulary" target="_blank" rel="noreferrer">KyleBing/english-vocabulary</a>
+            <p>用于四六级词条、中文释义及可用的中英例句。当前离线索引覆盖 <b id="offline-count">-</b> 个去重词条。</p>
+            <a href="https://github.com/skywind3000/ECDICT" target="_blank" rel="noreferrer">skywind3000/ECDICT</a>
+            <p>参考其英汉词典字段设计、词形与本地查询思路，为自定义释义和扩展查询保留结构。</p>
+            <a href="https://github.com/excing/find-roots-of-word" target="_blank" rel="noreferrer">excing/find-roots-of-word</a>
+            <p>采用其词根词缀数据，为翻译页提供实验性的构词拆解提示。</p>
+            <p class="licence-note">使用和再分发数据前，请遵守各来源仓库声明的许可与署名要求。</p>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="editor-dialog" class="editor-dialog">
+      <form id="editor-form" method="dialog">
+        <div class="dialog-heading">
+          <div class="editor-title">
+            <p class="eyebrow" id="match-label">匹配结果</p>
+            <div class="editor-word-row">
+              <h2 id="editor-word"></h2>
+              <button id="editor-favorite" class="favorite-button" type="button" aria-label="收藏该单词" aria-pressed="false">☆</button>
+            </div>
+          </div>
+          <button class="close" id="close-editor" type="button" aria-label="关闭">x</button>
+        </div>
+        <p id="match-message" class="match-message"></p>
+        <div class="word-suggestions hidden" id="word-suggestions">
+          <strong>你是不是想输入：</strong>
+          <div id="word-suggestion-options"></div>
+        </div>
+        <div class="sense-picker hidden" id="sense-picker">
+          <div class="sense-heading">
+            <strong>推荐义项</strong>
+            <span>可多选，选择会同步到释义框</span>
+          </div>
+          <div class="sense-options" id="sense-options"></div>
+        </div>
+        <label>音标
+          <input id="editor-phonetic" type="text" placeholder="可选" />
+        </label>
+        <label>释义 <em>必填，可修改</em>
+          <textarea id="editor-translation" rows="3" required placeholder="请输入该词的中文释义"></textarea>
+        </label>
+        <label>英文例句 <em>可自定义</em>
+          <textarea id="editor-example" rows="2" placeholder="输入帮助记忆的英文例句"></textarea>
+        </label>
+        <label>例句翻译 <em>可自定义</em>
+          <textarea id="editor-example-zh" rows="2" placeholder="输入例句中文翻译"></textarea>
+        </label>
+        <p class="root-preview" id="root-preview"></p>
+        <button class="primary full" type="submit">确认加入学习库</button>
+      </form>
+    </dialog>
+    <div class="toast hidden" id="toast" role="status"></div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+*.log
+.env
+.env.*
+
+# Large third-party source dictionaries are kept out of the portfolio repo.
+# The generated browser data in public/data/ is enough to run the app.
+data/sources/ecdict/
+data/sources/kylebing/
+data/sources/excing/
+!data/sources/README.md
